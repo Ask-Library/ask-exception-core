@@ -32,7 +32,7 @@ publishing {
             pom {
                 name.set("Ask Exception Core")
                 description.set("This Java library simplifies exception handling by eliminating boilerplate code and automatically binding clean exceptions to centralized error catalogs via Convention over Configuration.")
-                url.set("https://github.com/Ask-Library/ask-core")
+                url.set("https://github.com/Ask-Library/ask-exception-core")
 
                 licenses {
                     license {
