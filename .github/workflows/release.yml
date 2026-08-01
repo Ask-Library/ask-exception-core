@@ -12,12 +12,8 @@ permissions:
 
 jobs:
   release:
-    if: >
-      github.event.pull_request.merged == true &&
-      github.event.pull_request.head.ref == 'dev'
-
+    if: github.event.pull_request.merged == true && github.event.pull_request.head.ref == 'dev'
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v7
@@ -26,31 +22,27 @@ jobs:
         uses: actions/setup-java@v5
         with:
           java-version: '21'
-          distribution: temurin
+          distribution: 'temurin'
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v6
 
-      - name: Grant execute permissions to Gradle
+      - name: Grant execute permissions to gradlew
         run: chmod +x gradlew
 
       - name: Build with Gradle
         run: ./gradlew build --no-daemon
 
       - name: Extract version from Gradle
-        shell: bash
         run: |
-          RAW_VERSION=$(./gradlew properties -q | awk '/^version:/ {print $2; exit}')
-          VERSION=$(echo "$RAW_VERSION" | sed -E 's/^[vV]//')
-
-          echo "APP_VERSION=$VERSION" >> "$GITHUB_ENV"
-          echo "Release version: $VERSION"
+          VERSION=$(./gradlew properties -q | grep "^version:" | awk '{print $2}') 
+          echo "APP_VERSION=$VERSION" >> $GITHUB_ENV
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v3
         with:
-          tag_name: ${{ env.APP_VERSION }}
-          name: ${{ env.APP_VERSION }}
+          tag_name: "${{ env.APP_VERSION }}"
+          name: "Release v${{ env.APP_VERSION }} (PR #${{ github.event.pull_request.number }})"
           generate_release_notes: true
           files: |
             build/libs/*.jar
